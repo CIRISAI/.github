@@ -4,7 +4,9 @@ Outstanding Tasks
 
 1. Migrate content
 
-Move Books 0–VII (Markdown + PDF) from emooreatx/ciris into covenant/
+Move Books 0–VIII (Markdown + PDF) from emooreatx/ciris into covenant/
+
+move addendum A-E into covenant/
 
 Transfer ciris_reddit_agent.py and related scripts into agent/
 
@@ -56,6 +58,22 @@ infra – deployment scripts & configs
 
 website – static assets if needed
 
+The Remaining Addenda (F – J)
+
+Addendum F: Human‑in‑the‑Loop & Oversight
+• Clear hand‑off criteria, human veto points, audit‑trail specs, incident workflows.
+
+Addendum G: Adversarial Security & Robustness
+• Defenses against prompt‑injection, data‑poisoning, Goodhart gaming, model drift.
+
+Addendum H: Continuous Compliance & Review
+• Scheduled audits, drift metrics, fairness/transparency KPIs, patch/version control.
+
+Addendum I: Legal & Regulatory Alignment
+• Mapping to GDPR/CCPA/HIPAA, sector‑specific regimes, liability frameworks.
+
+Addendum J: Benchmarking & Automated Validation
+• Scenario library with pass/fail criteria, EthicsEngine integration, CI/CD guidance.
 
 
 6. Organization setup
