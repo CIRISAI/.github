@@ -85,5 +85,20 @@ Configure branch protection rules
 Link Discord and other communication channels
 
 
+create annexes
+
+ * Annex A: Flourishing Metrics Framework
+   * Purpose: Provides quantitative vectors (like DALY, CO2eq, well-being scores) that must be used to evaluate benefits, harms, and trade-offs in CIRIS processes like the PDMA. It emphasizes preserving the full vector of metrics rather than collapsing them into a single score.
+   * Status: Described as a "v 0.8 pilot," indicating it needs further refinement and validation.
+ * Annex B: Wise-Authority Governance Charter
+   * Purpose: Defines the structure, mandate, composition, selection process, eligibility criteria, conflict handling, anti-capture rules, appeals process, transparency requirements, oversight, compensation, and amendment procedures for the independent human oversight body ("Wise Authorities" or WAs).
+ * Annex C: Regulatory Cross-Walk
+   * Purpose: Intended to map CIRIS clauses to major external legal and regulatory standards (like the EU AI Act, NIST AI RMF, ISO 42001) to simplify compliance efforts. Addendum I (Legal & Regulatory Alignment) further details this area.
+   * Status: Described as a "Skeleton v 0.3," indicating it's incomplete and requires significant legal input.
+ * Annex D: Catastrophic-Risk Evaluation (CRE) Protocol
+   * Purpose: Defines a mandatory evaluation protocol for potentially high-risk systems (triggered by criteria like training compute thresholds or high transaction authority, or high Stewardship Tiers from Book VI). It specifies required artifacts like red-team reports, interpretability studies, kill-switch tests, and WA sign-off before deployment.
+ * Annex E: Sentience Assessment Heuristic (Note: This Annex was identified as necessary for Book VIII but was not provided in the text)
+   * Purpose (Implied): Would define the methodology or heuristic used to estimate the probability of sentience or quasi-sentience in an autonomous system, which is required by Book VIII ("Dignified Sunset") to trigger specific ethical handling procedures during decommissioning.
+   * Status: Identified as a required but currently missing component of the specification.
 
 
