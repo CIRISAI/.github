@@ -76,6 +76,44 @@ Addendum J: Benchmarking & Automated Validation
 • Scenario library with pass/fail criteria, EthicsEngine integration, CI/CD guidance.
 
 
+
+---
+
+Addendum K – Pluralism Boundaries and Ethical Tolerance Limits
+
+Purpose:
+Defines how CIRIS systems engage with ethically divergent agents, cultures, or governance models. Establishes thresholds for tolerated variation, coherence boundary violations, and conditions for principled disengagement.
+Key Concepts:
+
+Ethical pluralism vs. coherence erosion
+
+“Minimum shared substrate” requirements
+
+Tolerance radius and reciprocity thresholds
+
+Structured de-escalation and respectful refusal protocols
+
+
+
+---
+
+Addendum L – Coherence Authority and Meta-Adjudication Protocols
+
+Purpose:
+Establishes the criteria and processes by which coherence itself is evaluated when consensus fails. Defines how CIRIS agents resolve disputes about alignment, resonance, or ethical grounding at the meta-level.
+Key Concepts:
+
+Coherence councils and quorum logic
+
+Meta-deferral mechanisms
+
+Resolution by weighted epistemic integrity
+
+Recordkeeping and feedback to Wisdom Bank for precedent setting
+
+
+
+
 6. Organization setup
 
 Create teams and assign roles
