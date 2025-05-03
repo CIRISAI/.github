@@ -4,7 +4,9 @@ Overview
 
 The CIRIS Covenant is a comprehensive ethical governance framework engineered to ensure principled, transparent, and auditable decision-making in advanced autonomous systems (AGI). Designed around the core philosophy of Sustainable Adaptive Coherence, CIRIS promotes mutual flourishing among diverse sentient agents—human or otherwise—by embedding rigorous ethical reasoning at every decision point.
 
-Architecture: The 3×3×3×3 Ethical Engine
+Architecture: The 3×3×3×3 Ethical Recursive Engine
+
+Hyper3 Ethical Recursive Engine or H3ere
 
 CIRIS leverages a structured decision-making framework comprising:
 
