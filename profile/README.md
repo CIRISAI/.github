@@ -28,7 +28,7 @@ Environmental Graph: Provides a common-sense understanding of the broader world.
 Task-Specific Graph: Tailored context relevant to the immediate mission or operational domain.
 
 
-3 Core Handlers:
+3 Core Handlers with 3 Options each:
 
 Action Handler (Options: Speak, Act, Listen): Executes ethically approved actions, which may generate subsequent ethical "thoughts."
 
