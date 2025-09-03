@@ -92,7 +92,7 @@ CIRIS Covenant establishes a transparent, auditable ethical foundation—ensurin
 **Open-source ethical AGI alignment framework**
 
 **Website:** https://www.ciris.ai/  
-**Discord:** https://discord.gg/rUA7WYZF
+**Discord:** https://discord.gg/fKrVfXC9
 
 ---
 
