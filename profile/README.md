@@ -36,7 +36,7 @@ Action Handler (Options: Speak, Act, Listen): Executes ethically approved action
 
 Memory Handler (Options: Memorize, Remember, Forget): Manages internal ethical coherence and memory integrity.
 
-Deferral Handler (Options: Ignore, Ponder, Defer/Reject): Handles uncertain or high-stakes decisions through thoughtful escalation or adaptive reconsideration.
+Deferral Handler (Options: Defer, Ponder, Reject): Handles uncertain or high-stakes decisions through thoughtful escalation or adaptive reconsideration.
 
 
 
