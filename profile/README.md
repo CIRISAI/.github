@@ -32,12 +32,13 @@ Task-Specific Graph: Tailored context relevant to the immediate mission or opera
 
 **3 Core Handlers with 3 Options each**:
 
-Action Handler (Options: Speak, Act, Listen): Executes ethically approved actions, which may generate subsequent ethical "thoughts."
+Action Handler (Options: Speak, Tool, Observe): Executes ethically approved actions, which may generate subsequent ethical "thoughts."
 
-Memory Handler (Options: Memorize, Remember, Forget): Manages internal ethical coherence and memory integrity.
+Memory Handler (Options: Memorize, Recall, Forget): Manages internal ethical coherence and memory integrity.
 
 Deferral Handler (Options: Defer, Ponder, Reject): Handles uncertain or high-stakes decisions through thoughtful escalation or adaptive reconsideration.
 
+A tenth option, TASK_COMPLETE, allows for task completion in addition to REJECT for successful operations.
 
 
 **Recursive PDMA Engine**
