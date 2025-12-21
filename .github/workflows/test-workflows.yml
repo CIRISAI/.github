@@ -31,13 +31,13 @@ jobs:
       dry_run: false
       base_url: 'http://localhost:8080'
 
-  # Full matrix - tests all installation methods
+  # Full matrix - tests install.sh end-to-end
   full-matrix:
     if: inputs.test_type == 'full-matrix'
     uses: ./.github/workflows/_install-matrix.yml
     with:
-      install_method: 'wheel'
-      first_run_test: false
+      install_method: 'install.sh'
+      first_run_test: true
       run_qa: false
 
   summary:

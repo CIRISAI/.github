@@ -36,7 +36,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install CIRIS via install.sh
-        run: curl -sSL https://ciris.ai/install.sh | bash
+        run: |
+          # CI can't use systemd, so skip service creation
+          curl -sSL https://ciris.ai/install.sh | bash -s -- --skip-service
+        env:
+          CIRIS_AGENT_PORT: 8080
+
+      - name: Start agent in background
+        run: |
+          cd ~/ciris/CIRISAgent
+          source .venv/bin/activate
+          nohup python main.py --adapter api --port 8080 > agent.log 2>&1 &
+          echo $! > agent.pid
+          # Wait for agent to be ready
+          for i in {1..30}; do
+            if curl -sf http://localhost:8080/v1/system/health > /dev/null 2>&1; then
+              echo "Agent is ready"
+              break
+            fi
+            echo "Waiting for agent... ($i/30)"
+            sleep 2
+          done
 
       - name: Verify installation
         uses: CIRISAI/.github/.github/actions/verify-ciris@main
@@ -44,13 +64,44 @@ jobs:
           install_method: install.sh
           first_run: ${{ inputs.first_run_test }}
           verify_script_ref: ${{ inputs.verify_script_ref }}
+
+      - name: Collect logs on failure
+        if: failure()
+        run: |
+          echo "=== Agent Log ==="
+          cat ~/ciris/CIRISAgent/agent.log || true
+
+      - name: Cleanup
+        if: always()
+        run: |
+          if [ -f ~/ciris/CIRISAgent/agent.pid ]; then
+            kill $(cat ~/ciris/CIRISAgent/agent.pid) 2>/dev/null || true
+          fi
 
   install-sh-macos:
     if: inputs.install_method == 'all' || inputs.install_method == 'install.sh'
     runs-on: macos-latest
     steps:
       - name: Install CIRIS via install.sh
-        run: curl -sSL https://ciris.ai/install.sh | bash
+        run: |
+          curl -sSL https://ciris.ai/install.sh | bash -s -- --skip-service
+        env:
+          CIRIS_AGENT_PORT: 8080
+
+      - name: Start agent in background
+        run: |
+          cd ~/ciris/CIRISAgent
+          source .venv/bin/activate
+          nohup python main.py --adapter api --port 8080 > agent.log 2>&1 &
+          echo $! > agent.pid
+          for i in {1..30}; do
+            if curl -sf http://localhost:8080/v1/system/health > /dev/null 2>&1; then
+              echo "Agent is ready"
+              break
+            fi
+            echo "Waiting for agent... ($i/30)"
+            sleep 2
+          done
 
       - name: Verify installation
         uses: CIRISAI/.github/.github/actions/verify-ciris@main
@@ -58,6 +109,17 @@ jobs:
           install_method: install.sh
           first_run: ${{ inputs.first_run_test }}
           verify_script_ref: ${{ inputs.verify_script_ref }}
+
+      - name: Collect logs on failure
+        if: failure()
+        run: cat ~/ciris/CIRISAgent/agent.log || true
+
+      - name: Cleanup
+        if: always()
+        run: |
+          if [ -f ~/ciris/CIRISAgent/agent.pid ]; then
+            kill $(cat ~/ciris/CIRISAgent/agent.pid) 2>/dev/null || true
+          fi
 
   # install.sh in containers
   install-sh-debian:
@@ -96,7 +158,9 @@ jobs:
           skip_interaction: 'true'
           verify_script_ref: ${{ inputs.verify_script_ref }}
 
-  # wheel installations across Python versions
+  # wheel installations - verify package installs correctly
+  # Note: wheel only installs dependencies, doesn't provide CLI to run agent
+  # For full e2e testing, use install.sh method
   wheel-python310:
     if: inputs.install_method == 'all' || inputs.install_method == 'wheel'
     runs-on: ubuntu-latest
@@ -111,12 +175,10 @@ jobs:
           pip install --upgrade pip
           pip install ciris-agent
 
-      - name: Verify installation
-        uses: CIRISAI/.github/.github/actions/verify-ciris@main
-        with:
-          install_method: wheel
-          first_run: ${{ inputs.first_run_test }}
-          verify_script_ref: ${{ inputs.verify_script_ref }}
+      - name: Verify package installed
+        run: |
+          python -c "import ciris_engine; print(f'ciris_engine version: {ciris_engine.__version__ if hasattr(ciris_engine, \"__version__\") else \"installed\"}')"
+          pip show ciris-agent
 
   wheel-python311:
     if: inputs.install_method == 'all' || inputs.install_method == 'wheel'
@@ -132,12 +194,10 @@ jobs:
           pip install --upgrade pip
           pip install ciris-agent
 
-      - name: Verify installation
-        uses: CIRISAI/.github/.github/actions/verify-ciris@main
-        with:
-          install_method: wheel
-          first_run: ${{ inputs.first_run_test }}
-          verify_script_ref: ${{ inputs.verify_script_ref }}
+      - name: Verify package installed
+        run: |
+          python -c "import ciris_engine; print(f'ciris_engine version: {ciris_engine.__version__ if hasattr(ciris_engine, \"__version__\") else \"installed\"}')"
+          pip show ciris-agent
 
   wheel-python312:
     if: inputs.install_method == 'all' || inputs.install_method == 'wheel'
@@ -153,12 +213,10 @@ jobs:
           pip install --upgrade pip
           pip install ciris-agent
 
-      - name: Verify installation
-        uses: CIRISAI/.github/.github/actions/verify-ciris@main
-        with:
-          install_method: wheel
-          first_run: ${{ inputs.first_run_test }}
-          verify_script_ref: ${{ inputs.verify_script_ref }}
+      - name: Verify package installed
+        run: |
+          python -c "import ciris_engine; print(f'ciris_engine version: {ciris_engine.__version__ if hasattr(ciris_engine, \"__version__\") else \"installed\"}')"
+          pip show ciris-agent
 
   wheel-macos:
     if: inputs.install_method == 'all' || inputs.install_method == 'wheel'
@@ -174,12 +232,10 @@ jobs:
           pip install --upgrade pip
           pip install ciris-agent
 
-      - name: Verify installation
-        uses: CIRISAI/.github/.github/actions/verify-ciris@main
-        with:
-          install_method: wheel
-          first_run: ${{ inputs.first_run_test }}
-          verify_script_ref: ${{ inputs.verify_script_ref }}
+      - name: Verify package installed
+        run: |
+          python -c "import ciris_engine; print(f'ciris_engine version: {ciris_engine.__version__ if hasattr(ciris_engine, \"__version__\") else \"installed\"}')"
+          pip show ciris-agent
 
   # Docker deployment
   docker:
