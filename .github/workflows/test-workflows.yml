@@ -1,0 +1,56 @@
+name: Test Reusable Workflows
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Which workflow to test'
+        required: true
+        default: 'dry-run'
+        type: choice
+        options:
+          - dry-run
+          - qa-only
+          - full-matrix
+
+jobs:
+  # Dry run test - validates workflow syntax without actual installation
+  dry-run:
+    if: inputs.test_type == 'dry-run'
+    uses: ./.github/workflows/_qa-subset.yml
+    with:
+      modules: 'api setup handler'
+      dry_run: true
+
+  # QA only - runs actual QA tests (requires running CIRIS instance)
+  qa-only:
+    if: inputs.test_type == 'qa-only'
+    uses: ./.github/workflows/_qa-subset.yml
+    with:
+      modules: 'api setup'
+      dry_run: false
+      base_url: 'http://localhost:8080'
+
+  # Full matrix - tests all installation methods
+  full-matrix:
+    if: inputs.test_type == 'full-matrix'
+    uses: ./.github/workflows/_install-matrix.yml
+    with:
+      install_method: 'wheel'
+      first_run_test: false
+      run_qa: false
+
+  summary:
+    needs: [dry-run, qa-only, full-matrix]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test Results
+        run: |
+          echo "## Workflow Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Test | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| dry-run | ${{ needs.dry-run.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| qa-only | ${{ needs.qa-only.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| full-matrix | ${{ needs.full-matrix.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
