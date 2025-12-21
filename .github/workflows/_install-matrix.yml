@@ -17,8 +17,8 @@ on:
         default: false
         type: boolean
       qa_modules:
-        description: 'QA modules to run (if run_qa=true)'
-        default: 'auth system'
+        description: 'QA modules to run (api setup handler billing consent filter sdk)'
+        default: 'api setup'
         type: string
       first_run_test:
         description: 'Test first-run setup flow'

@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       modules:
-        description: 'Space-separated QA modules to run (auth system agent memory)'
+        description: 'Space-separated QA modules (api billing consent setup handler filter sdk)'
         required: true
         type: string
       ciris_ref:
@@ -19,18 +19,23 @@ on:
         description: 'Run in dry-run mode (no actual tests)'
         default: false
         type: boolean
+      base_url:
+        description: 'CIRIS API base URL for tests'
+        default: 'http://localhost:8080'
+        type: string
 
 jobs:
   qa-runner:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout CIRISAgent QA runner
+      - name: Checkout CIRISAgent
         uses: actions/checkout@v4
         with:
           repository: CIRISAI/CIRISAgent
           ref: ${{ inputs.ciris_ref }}
-          sparse-checkout: qa_runner/
+          sparse-checkout: |
+            tools/qa_runner/
           sparse-checkout-cone-mode: false
 
       - name: Setup Python
@@ -42,7 +47,11 @@ jobs:
       - name: Install QA dependencies
         run: |
           pip install --upgrade pip
-          pip install pytest pytest-asyncio httpx
+          if [ -f tools/qa_runner/requirements.txt ]; then
+            pip install -r tools/qa_runner/requirements.txt
+          else
+            pip install pytest pytest-asyncio httpx aiohttp pydantic
+          fi
         shell: bash
 
       - name: Run QA modules
@@ -51,12 +60,14 @@ jobs:
           QA_MODULES: ${{ inputs.modules }}
           DRY_RUN: ${{ inputs.dry_run }}
           FAIL_FAST: ${{ inputs.fail_fast }}
+          CIRIS_BASE_URL: ${{ inputs.base_url }}
         run: |
-          cd qa_runner
+          cd tools/qa_runner
 
           MODULES=($QA_MODULES)
           FAILED=0
           PASSED=0
+          SKIPPED=0
 
           for module in "${MODULES[@]}"; do
             echo ""
@@ -64,14 +75,17 @@ jobs:
             echo "Running QA module: $module"
             echo "=========================================="
 
+            # Map module name to actual test file
+            TEST_FILE="modules/${module}_tests.py"
+
             if [ "$DRY_RUN" = "true" ]; then
-              echo "[DRY RUN] Would run: pytest test_${module}.py"
+              echo "[DRY RUN] Would run: pytest $TEST_FILE"
               ((PASSED++))
               continue
             fi
 
-            if [ -f "test_${module}.py" ]; then
-              if pytest "test_${module}.py" -v --tb=short; then
+            if [ -f "$TEST_FILE" ]; then
+              if pytest "$TEST_FILE" -v --tb=short; then
                 echo "Module $module: PASSED"
                 ((PASSED++))
               else
@@ -83,17 +97,19 @@ jobs:
                 fi
               fi
             else
-              echo "Warning: test_${module}.py not found, skipping"
+              echo "Warning: $TEST_FILE not found, skipping"
+              ((SKIPPED++))
             fi
           done
 
           echo ""
           echo "=========================================="
-          echo "QA Summary: $PASSED passed, $FAILED failed"
+          echo "QA Summary: $PASSED passed, $FAILED failed, $SKIPPED skipped"
           echo "=========================================="
 
           echo "passed=$PASSED" >> $GITHUB_OUTPUT
           echo "failed=$FAILED" >> $GITHUB_OUTPUT
+          echo "skipped=$SKIPPED" >> $GITHUB_OUTPUT
 
           if [ $FAILED -gt 0 ]; then
             exit 1
@@ -106,12 +122,13 @@ jobs:
         with:
           name: qa-results-${{ github.run_id }}
           path: |
-            qa_runner/*.xml
-            qa_runner/*.log
+            tools/qa_runner/qa_reports*/*.json
+            tools/qa_runner/*.log
           if-no-files-found: ignore
 
-  qa-auth:
-    if: contains(inputs.modules, 'auth')
+  # Parallel module jobs for faster execution
+  qa-api:
+    if: contains(inputs.modules, 'api')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -119,49 +136,33 @@ jobs:
         with:
           repository: CIRISAI/CIRISAgent
           ref: ${{ inputs.ciris_ref }}
-          sparse-checkout: qa_runner/
+          sparse-checkout: tools/qa_runner/
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Run auth module
+      - name: Install dependencies
         run: |
-          cd qa_runner
-          if [ "${{ inputs.dry_run }}" = "true" ]; then
-            echo "[DRY RUN] auth module"
-          else
-            pytest test_auth.py -v || exit 1
+          pip install pytest pytest-asyncio httpx aiohttp pydantic
+          if [ -f tools/qa_runner/requirements.txt ]; then
+            pip install -r tools/qa_runner/requirements.txt
           fi
 
-  qa-system:
-    if: contains(inputs.modules, 'system')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          repository: CIRISAI/CIRISAgent
-          ref: ${{ inputs.ciris_ref }}
-          sparse-checkout: qa_runner/
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Run system module
+      - name: Run api module
+        env:
+          CIRIS_BASE_URL: ${{ inputs.base_url }}
         run: |
-          cd qa_runner
+          cd tools/qa_runner
           if [ "${{ inputs.dry_run }}" = "true" ]; then
-            echo "[DRY RUN] system module"
+            echo "[DRY RUN] api module"
           else
-            pytest test_system.py -v || exit 1
+            pytest modules/api_tests.py -v --tb=short || exit 1
           fi
 
-  qa-agent:
-    if: contains(inputs.modules, 'agent')
+  qa-setup:
+    if: contains(inputs.modules, 'setup')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -169,18 +170,61 @@ jobs:
         with:
           repository: CIRISAI/CIRISAgent
           ref: ${{ inputs.ciris_ref }}
-          sparse-checkout: qa_runner/
+          sparse-checkout: tools/qa_runner/
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Run agent module
+      - name: Install dependencies
         run: |
-          cd qa_runner
+          pip install pytest pytest-asyncio httpx aiohttp pydantic
+          if [ -f tools/qa_runner/requirements.txt ]; then
+            pip install -r tools/qa_runner/requirements.txt
+          fi
+
+      - name: Run setup module
+        env:
+          CIRIS_BASE_URL: ${{ inputs.base_url }}
+        run: |
+          cd tools/qa_runner
           if [ "${{ inputs.dry_run }}" = "true" ]; then
-            echo "[DRY RUN] agent module"
+            echo "[DRY RUN] setup module"
           else
-            pytest test_agent.py -v || exit 1
+            pytest modules/setup_tests.py -v --tb=short || exit 1
+          fi
+
+  qa-handler:
+    if: contains(inputs.modules, 'handler')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: CIRISAI/CIRISAgent
+          ref: ${{ inputs.ciris_ref }}
+          sparse-checkout: tools/qa_runner/
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install pytest pytest-asyncio httpx aiohttp pydantic
+          if [ -f tools/qa_runner/requirements.txt ]; then
+            pip install -r tools/qa_runner/requirements.txt
+          fi
+
+      - name: Run handler module
+        env:
+          CIRIS_BASE_URL: ${{ inputs.base_url }}
+        run: |
+          cd tools/qa_runner
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "[DRY RUN] handler module"
+          else
+            pytest modules/handler_tests.py -v --tb=short || exit 1
           fi
