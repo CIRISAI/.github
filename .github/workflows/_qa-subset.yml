@@ -1,0 +1,186 @@
+name: QA Subset
+
+on:
+  workflow_call:
+    inputs:
+      modules:
+        description: 'Space-separated QA modules to run (auth system agent memory)'
+        required: true
+        type: string
+      ciris_ref:
+        description: 'CIRISAgent ref for QA runner'
+        default: 'main'
+        type: string
+      fail_fast:
+        description: 'Stop on first failure'
+        default: false
+        type: boolean
+      dry_run:
+        description: 'Run in dry-run mode (no actual tests)'
+        default: false
+        type: boolean
+
+jobs:
+  qa-runner:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout CIRISAgent QA runner
+        uses: actions/checkout@v4
+        with:
+          repository: CIRISAI/CIRISAgent
+          ref: ${{ inputs.ciris_ref }}
+          sparse-checkout: qa_runner/
+          sparse-checkout-cone-mode: false
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install QA dependencies
+        run: |
+          pip install --upgrade pip
+          pip install pytest pytest-asyncio httpx
+        shell: bash
+
+      - name: Run QA modules
+        id: qa
+        env:
+          QA_MODULES: ${{ inputs.modules }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          FAIL_FAST: ${{ inputs.fail_fast }}
+        run: |
+          cd qa_runner
+
+          MODULES=($QA_MODULES)
+          FAILED=0
+          PASSED=0
+
+          for module in "${MODULES[@]}"; do
+            echo ""
+            echo "=========================================="
+            echo "Running QA module: $module"
+            echo "=========================================="
+
+            if [ "$DRY_RUN" = "true" ]; then
+              echo "[DRY RUN] Would run: pytest test_${module}.py"
+              ((PASSED++))
+              continue
+            fi
+
+            if [ -f "test_${module}.py" ]; then
+              if pytest "test_${module}.py" -v --tb=short; then
+                echo "Module $module: PASSED"
+                ((PASSED++))
+              else
+                echo "Module $module: FAILED"
+                ((FAILED++))
+                if [ "$FAIL_FAST" = "true" ]; then
+                  echo "Fail-fast enabled, stopping"
+                  exit 1
+                fi
+              fi
+            else
+              echo "Warning: test_${module}.py not found, skipping"
+            fi
+          done
+
+          echo ""
+          echo "=========================================="
+          echo "QA Summary: $PASSED passed, $FAILED failed"
+          echo "=========================================="
+
+          echo "passed=$PASSED" >> $GITHUB_OUTPUT
+          echo "failed=$FAILED" >> $GITHUB_OUTPUT
+
+          if [ $FAILED -gt 0 ]; then
+            exit 1
+          fi
+        shell: bash
+
+      - name: Upload QA results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-results-${{ github.run_id }}
+          path: |
+            qa_runner/*.xml
+            qa_runner/*.log
+          if-no-files-found: ignore
+
+  qa-auth:
+    if: contains(inputs.modules, 'auth')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: CIRISAI/CIRISAgent
+          ref: ${{ inputs.ciris_ref }}
+          sparse-checkout: qa_runner/
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run auth module
+        run: |
+          cd qa_runner
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "[DRY RUN] auth module"
+          else
+            pytest test_auth.py -v || exit 1
+          fi
+
+  qa-system:
+    if: contains(inputs.modules, 'system')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: CIRISAI/CIRISAgent
+          ref: ${{ inputs.ciris_ref }}
+          sparse-checkout: qa_runner/
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run system module
+        run: |
+          cd qa_runner
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "[DRY RUN] system module"
+          else
+            pytest test_system.py -v || exit 1
+          fi
+
+  qa-agent:
+    if: contains(inputs.modules, 'agent')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: CIRISAI/CIRISAgent
+          ref: ${{ inputs.ciris_ref }}
+          sparse-checkout: qa_runner/
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run agent module
+        run: |
+          cd qa_runner
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "[DRY RUN] agent module"
+          else
+            pytest test_agent.py -v || exit 1
+          fi

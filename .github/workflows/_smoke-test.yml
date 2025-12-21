@@ -1,0 +1,119 @@
+name: Smoke Test
+
+on:
+  workflow_call:
+    inputs:
+      install_method:
+        description: 'Installation method that was used'
+        required: true
+        type: string
+      health_endpoint:
+        description: 'Health check endpoint URL'
+        default: 'http://localhost:8080/v1/system/health'
+        type: string
+      timeout_seconds:
+        description: 'Timeout for health check'
+        default: 30
+        type: number
+      require_services:
+        description: 'Comma-separated list of required services'
+        default: ''
+        type: string
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout verification scripts
+        uses: actions/checkout@v4
+        with:
+          repository: CIRISAI/CIRISAgent
+          sparse-checkout: scripts/verify_install.sh
+          sparse-checkout-cone-mode: false
+
+      - name: Wait for service startup
+        run: |
+          echo "Waiting for CIRIS to start..."
+          sleep 5
+        shell: bash
+
+      - name: Health check
+        id: health
+        run: |
+          TIMEOUT=${{ inputs.timeout_seconds }}
+          ENDPOINT="${{ inputs.health_endpoint }}"
+
+          for i in $(seq 1 $TIMEOUT); do
+            if curl -sf "$ENDPOINT" > /dev/null 2>&1; then
+              echo "Health check passed on attempt $i"
+              echo "healthy=true" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+            echo "Attempt $i: waiting..."
+            sleep 1
+          done
+
+          echo "Health check failed after $TIMEOUT seconds"
+          echo "healthy=false" >> $GITHUB_OUTPUT
+          exit 1
+        shell: bash
+
+      - name: Verify required services
+        if: inputs.require_services != ''
+        run: |
+          SERVICES="${{ inputs.require_services }}"
+          ENDPOINT="${{ inputs.health_endpoint }}"
+
+          HEALTH_DATA=$(curl -sf "$ENDPOINT")
+
+          IFS=',' read -ra SERVICE_LIST <<< "$SERVICES"
+          for service in "${SERVICE_LIST[@]}"; do
+            service=$(echo "$service" | xargs)
+            if echo "$HEALTH_DATA" | grep -q "\"$service\""; then
+              echo "Service $service: OK"
+            else
+              echo "Service $service: MISSING"
+              exit 1
+            fi
+          done
+
+          echo "All required services verified"
+        shell: bash
+
+      - name: Verify ethical pipeline
+        run: |
+          # Check that H3ERE pipeline is responding
+          ENDPOINT="${{ inputs.health_endpoint }}"
+
+          HEALTH=$(curl -sf "$ENDPOINT")
+
+          # Verify cognitive state is valid
+          if echo "$HEALTH" | grep -qE '"cognitive_state":\s*"(WAKEUP|WORK|SHUTDOWN)"'; then
+            echo "Cognitive state: OK"
+          else
+            echo "Warning: Could not verify cognitive state"
+          fi
+
+          # Verify no red-line violations
+          if echo "$HEALTH" | grep -q '"red_line_violation":\s*true'; then
+            echo "ERROR: Red-line violation detected"
+            exit 1
+          fi
+
+          echo "Ethical pipeline verification complete"
+        shell: bash
+
+      - name: Log system info
+        if: always()
+        run: |
+          echo "=== Installation Method: ${{ inputs.install_method }} ==="
+          echo "=== System Information ==="
+          uname -a
+          echo ""
+          echo "=== Memory Usage ==="
+          free -h 2>/dev/null || vm_stat 2>/dev/null || echo "Memory stats unavailable"
+          echo ""
+          echo "=== Disk Usage ==="
+          df -h
+        shell: bash

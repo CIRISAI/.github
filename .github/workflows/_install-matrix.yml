@@ -1,0 +1,286 @@
+name: Install Matrix
+
+on:
+  workflow_call:
+    inputs:
+      install_method:
+        description: 'Installation method to test (install.sh, wheel, docker, apk, all)'
+        required: false
+        default: 'all'
+        type: string
+      verify_script_ref:
+        description: 'CIRISAgent ref for verify_install.sh'
+        default: 'main'
+        type: string
+      run_qa:
+        description: 'Run QA subset after install'
+        default: false
+        type: boolean
+      qa_modules:
+        description: 'QA modules to run (if run_qa=true)'
+        default: 'auth system'
+        type: string
+      first_run_test:
+        description: 'Test first-run setup flow'
+        default: false
+        type: boolean
+      python_versions:
+        description: 'Python versions for wheel (comma-separated)'
+        default: '3.10,3.11,3.12'
+        type: string
+
+jobs:
+  # install.sh on native runners
+  install-sh-ubuntu:
+    if: inputs.install_method == 'all' || inputs.install_method == 'install.sh'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install CIRIS via install.sh
+        run: curl -sSL https://ciris.ai/install.sh | bash
+
+      - name: Verify installation
+        uses: CIRISAI/.github/.github/actions/verify-ciris@main
+        with:
+          install_method: install.sh
+          first_run: ${{ inputs.first_run_test }}
+          verify_script_ref: ${{ inputs.verify_script_ref }}
+
+  install-sh-macos:
+    if: inputs.install_method == 'all' || inputs.install_method == 'install.sh'
+    runs-on: macos-latest
+    steps:
+      - name: Install CIRIS via install.sh
+        run: curl -sSL https://ciris.ai/install.sh | bash
+
+      - name: Verify installation
+        uses: CIRISAI/.github/.github/actions/verify-ciris@main
+        with:
+          install_method: install.sh
+          first_run: ${{ inputs.first_run_test }}
+          verify_script_ref: ${{ inputs.verify_script_ref }}
+
+  # install.sh in containers
+  install-sh-debian:
+    if: inputs.install_method == 'all' || inputs.install_method == 'install.sh'
+    runs-on: ubuntu-latest
+    container: debian:bookworm
+    steps:
+      - name: Install dependencies
+        run: apt-get update && apt-get install -y curl bash
+
+      - name: Install CIRIS via install.sh
+        run: curl -sSL https://ciris.ai/install.sh | bash
+
+      - name: Verify installation
+        uses: CIRISAI/.github/.github/actions/verify-ciris@main
+        with:
+          install_method: install.sh
+          skip_interaction: 'true'
+          verify_script_ref: ${{ inputs.verify_script_ref }}
+
+  install-sh-fedora:
+    if: inputs.install_method == 'all' || inputs.install_method == 'install.sh'
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    steps:
+      - name: Install dependencies
+        run: dnf install -y curl bash
+
+      - name: Install CIRIS via install.sh
+        run: curl -sSL https://ciris.ai/install.sh | bash
+
+      - name: Verify installation
+        uses: CIRISAI/.github/.github/actions/verify-ciris@main
+        with:
+          install_method: install.sh
+          skip_interaction: 'true'
+          verify_script_ref: ${{ inputs.verify_script_ref }}
+
+  # wheel installations across Python versions
+  wheel-python310:
+    if: inputs.install_method == 'all' || inputs.install_method == 'wheel'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install CIRIS via wheel
+        run: |
+          pip install --upgrade pip
+          pip install ciris-agent
+
+      - name: Verify installation
+        uses: CIRISAI/.github/.github/actions/verify-ciris@main
+        with:
+          install_method: wheel
+          first_run: ${{ inputs.first_run_test }}
+          verify_script_ref: ${{ inputs.verify_script_ref }}
+
+  wheel-python311:
+    if: inputs.install_method == 'all' || inputs.install_method == 'wheel'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install CIRIS via wheel
+        run: |
+          pip install --upgrade pip
+          pip install ciris-agent
+
+      - name: Verify installation
+        uses: CIRISAI/.github/.github/actions/verify-ciris@main
+        with:
+          install_method: wheel
+          first_run: ${{ inputs.first_run_test }}
+          verify_script_ref: ${{ inputs.verify_script_ref }}
+
+  wheel-python312:
+    if: inputs.install_method == 'all' || inputs.install_method == 'wheel'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install CIRIS via wheel
+        run: |
+          pip install --upgrade pip
+          pip install ciris-agent
+
+      - name: Verify installation
+        uses: CIRISAI/.github/.github/actions/verify-ciris@main
+        with:
+          install_method: wheel
+          first_run: ${{ inputs.first_run_test }}
+          verify_script_ref: ${{ inputs.verify_script_ref }}
+
+  wheel-macos:
+    if: inputs.install_method == 'all' || inputs.install_method == 'wheel'
+    runs-on: macos-latest
+    steps:
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install CIRIS via wheel
+        run: |
+          pip install --upgrade pip
+          pip install ciris-agent
+
+      - name: Verify installation
+        uses: CIRISAI/.github/.github/actions/verify-ciris@main
+        with:
+          install_method: wheel
+          first_run: ${{ inputs.first_run_test }}
+          verify_script_ref: ${{ inputs.verify_script_ref }}
+
+  # Docker deployment
+  docker:
+    if: inputs.install_method == 'all' || inputs.install_method == 'docker'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout CIRISAgent
+        uses: actions/checkout@v4
+        with:
+          repository: CIRISAI/CIRISAgent
+          ref: ${{ inputs.verify_script_ref }}
+
+      - name: Start CIRIS via Docker Compose
+        run: |
+          if [ -f docker-compose.yml ]; then
+            docker compose up -d --wait
+          else
+            echo "No docker-compose.yml found, building from Dockerfile"
+            docker build -t ciris:test .
+            docker run -d -p 8080:8080 --name ciris-test ciris:test
+            sleep 15
+          fi
+
+      - name: Verify installation
+        uses: CIRISAI/.github/.github/actions/verify-ciris@main
+        with:
+          install_method: docker
+          first_run: ${{ inputs.first_run_test }}
+          timeout: '60'
+          verify_script_ref: ${{ inputs.verify_script_ref }}
+
+      - name: Collect Docker logs
+        if: failure()
+        run: |
+          docker compose logs 2>/dev/null || docker logs ciris-test 2>/dev/null || true
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker compose down 2>/dev/null || docker rm -f ciris-test 2>/dev/null || true
+
+  # APK on Android emulator
+  apk:
+    if: inputs.install_method == 'all' || inputs.install_method == 'apk'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout CIRISGUI-Android
+        uses: actions/checkout@v4
+        with:
+          repository: CIRISAI/CIRISGUI-Android
+          path: android-app
+
+      - name: Setup Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          script: |
+            echo "Installing APK..."
+            if [ -f android-app/app/build/outputs/apk/release/app-release.apk ]; then
+              adb install android-app/app/build/outputs/apk/release/app-release.apk
+            else
+              echo "No APK artifact found - build step required"
+            fi
+
+      - name: Verify APK installation
+        uses: CIRISAI/.github/.github/actions/verify-ciris@main
+        with:
+          install_method: apk
+          skip_interaction: 'true'
+          base_url: 'http://10.0.2.2:8080'
+          verify_script_ref: ${{ inputs.verify_script_ref }}
+
+  # Optional QA runner
+  qa-subset:
+    if: inputs.run_qa
+    needs: [install-sh-ubuntu, wheel-python311]
+    uses: ./.github/workflows/_qa-subset.yml
+    with:
+      modules: ${{ inputs.qa_modules }}
+      ciris_ref: ${{ inputs.verify_script_ref }}
+
+  # Summary job
+  summary:
+    if: always()
+    needs: [install-sh-ubuntu, install-sh-macos, install-sh-debian, install-sh-fedora, wheel-python310, wheel-python311, wheel-python312, wheel-macos, docker, apk]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check results
+        run: |
+          echo "## Installation Matrix Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Method | Environment | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| install.sh | Ubuntu | ${{ needs.install-sh-ubuntu.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| install.sh | macOS | ${{ needs.install-sh-macos.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| install.sh | Debian | ${{ needs.install-sh-debian.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| install.sh | Fedora | ${{ needs.install-sh-fedora.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| wheel | Python 3.10 | ${{ needs.wheel-python310.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| wheel | Python 3.11 | ${{ needs.wheel-python311.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| wheel | Python 3.12 | ${{ needs.wheel-python312.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| wheel | macOS | ${{ needs.wheel-macos.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| docker | Ubuntu | ${{ needs.docker.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| apk | Android | ${{ needs.apk.result }} |" >> $GITHUB_STEP_SUMMARY

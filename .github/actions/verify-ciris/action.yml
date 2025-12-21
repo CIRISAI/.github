@@ -1,0 +1,185 @@
+name: 'Verify CIRIS Installation'
+description: 'Validates CIRIS installation across deployment methods using verify_install.sh'
+author: 'CIRISAI'
+
+branding:
+  icon: 'check-circle'
+  color: 'green'
+
+inputs:
+  install_method:
+    description: 'Installation method (install.sh, wheel, docker, apk)'
+    required: true
+  base_url:
+    description: 'CIRIS API base URL'
+    default: 'http://localhost:8080'
+  timeout:
+    description: 'Request timeout in seconds'
+    default: '30'
+  verify_script_ref:
+    description: 'CIRISAgent ref for verify_install.sh'
+    default: 'main'
+  first_run:
+    description: 'Test first-run setup flow'
+    default: 'false'
+  llm_provider:
+    description: 'LLM provider for first-run (openai, local, other)'
+    default: 'local'
+  llm_api_key:
+    description: 'LLM API key for first-run'
+    default: 'mock_test_key'
+  llm_base_url:
+    description: 'LLM base URL for local/other providers'
+    default: 'http://localhost:11434'
+  llm_model:
+    description: 'LLM model name for local/other providers'
+    default: 'llama3'
+  skip_auth:
+    description: 'Skip authentication check'
+    default: 'false'
+  skip_interaction:
+    description: 'Skip agent interaction check'
+    default: 'false'
+  expected_version:
+    description: 'Expected CIRIS version (optional)'
+    default: ''
+  json_output:
+    description: 'Output results as JSON'
+    default: 'true'
+
+outputs:
+  success:
+    description: 'Whether all checks passed'
+    value: ${{ steps.verify.outputs.success }}
+  health:
+    description: 'Health check result'
+    value: ${{ steps.verify.outputs.health }}
+  version:
+    description: 'Version check result'
+    value: ${{ steps.verify.outputs.version }}
+  auth:
+    description: 'Auth check result'
+    value: ${{ steps.verify.outputs.auth }}
+  interaction:
+    description: 'Interaction check result'
+    value: ${{ steps.verify.outputs.interaction }}
+  raw_output:
+    description: 'Raw JSON output from verification'
+    value: ${{ steps.verify.outputs.raw }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout verification script
+      uses: actions/checkout@v4
+      with:
+        repository: CIRISAI/CIRISAgent
+        ref: ${{ inputs.verify_script_ref }}
+        sparse-checkout: scripts/verify_install.sh
+        sparse-checkout-cone-mode: false
+        path: .ciris-verify
+
+    - name: Make script executable
+      shell: bash
+      run: chmod +x .ciris-verify/scripts/verify_install.sh
+
+    - name: Wait for service startup
+      shell: bash
+      run: |
+        echo "Waiting for CIRIS to start (${{ inputs.install_method }} method)..."
+
+        # Different startup times for different methods
+        case "${{ inputs.install_method }}" in
+          docker)
+            sleep 10
+            ;;
+          apk)
+            sleep 15
+            ;;
+          *)
+            sleep 5
+            ;;
+        esac
+
+    - name: Run verification
+      id: verify
+      shell: bash
+      run: |
+        # Build command arguments
+        ARGS="-u ${{ inputs.base_url }} -t ${{ inputs.timeout }}"
+
+        # Add optional flags
+        if [ "${{ inputs.first_run }}" = "true" ]; then
+          ARGS="$ARGS --first-run"
+          ARGS="$ARGS --llm-provider ${{ inputs.llm_provider }}"
+          ARGS="$ARGS --llm-key ${{ inputs.llm_api_key }}"
+          if [ "${{ inputs.llm_provider }}" != "openai" ]; then
+            ARGS="$ARGS --llm-base-url ${{ inputs.llm_base_url }}"
+            ARGS="$ARGS --llm-model ${{ inputs.llm_model }}"
+          fi
+        fi
+
+        if [ "${{ inputs.skip_auth }}" = "true" ]; then
+          ARGS="$ARGS --skip-auth"
+        fi
+
+        if [ "${{ inputs.skip_interaction }}" = "true" ]; then
+          ARGS="$ARGS --skip-interaction"
+        fi
+
+        if [ -n "${{ inputs.expected_version }}" ]; then
+          ARGS="$ARGS -v ${{ inputs.expected_version }}"
+        fi
+
+        if [ "${{ inputs.json_output }}" = "true" ]; then
+          ARGS="$ARGS --json"
+        fi
+
+        echo "Running: verify_install.sh $ARGS"
+
+        # Run verification and capture output
+        set +e
+        OUTPUT=$(.ciris-verify/scripts/verify_install.sh $ARGS 2>&1)
+        EXIT_CODE=$?
+        set -e
+
+        echo "$OUTPUT"
+
+        # Parse JSON output for individual check results
+        if [ "${{ inputs.json_output }}" = "true" ]; then
+          echo "raw<<EOF" >> $GITHUB_OUTPUT
+          echo "$OUTPUT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          # Extract individual results using jq if available
+          if command -v jq &> /dev/null; then
+            echo "success=$(echo "$OUTPUT" | jq -r '.success')" >> $GITHUB_OUTPUT
+            echo "health=$(echo "$OUTPUT" | jq -r '.checks.health')" >> $GITHUB_OUTPUT
+            echo "version=$(echo "$OUTPUT" | jq -r '.checks.version')" >> $GITHUB_OUTPUT
+            echo "auth=$(echo "$OUTPUT" | jq -r '.checks.auth')" >> $GITHUB_OUTPUT
+            echo "interaction=$(echo "$OUTPUT" | jq -r '.checks.interaction')" >> $GITHUB_OUTPUT
+          else
+            # Fallback to simple grep
+            if [ $EXIT_CODE -eq 0 ]; then
+              echo "success=true" >> $GITHUB_OUTPUT
+            else
+              echo "success=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+        fi
+
+        exit $EXIT_CODE
+
+    - name: Upload verification results
+      if: always() && inputs.json_output == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: ciris-verify-${{ inputs.install_method }}-${{ github.run_id }}
+        path: |
+          .ciris-verify/scripts/*.log
+        if-no-files-found: ignore
+
+    - name: Cleanup
+      if: always()
+      shell: bash
+      run: rm -rf .ciris-verify
