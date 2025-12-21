@@ -80,17 +80,17 @@ jobs:
 
             if [ "$DRY_RUN" = "true" ]; then
               echo "[DRY RUN] Would run: pytest $TEST_FILE"
-              ((PASSED++))
+              PASSED=$((PASSED + 1))
               continue
             fi
 
             if [ -f "$TEST_FILE" ]; then
               if pytest "$TEST_FILE" -v --tb=short; then
                 echo "Module $module: PASSED"
-                ((PASSED++))
+                PASSED=$((PASSED + 1))
               else
                 echo "Module $module: FAILED"
-                ((FAILED++))
+                FAILED=$((FAILED + 1))
                 if [ "$FAIL_FAST" = "true" ]; then
                   echo "Fail-fast enabled, stopping"
                   exit 1
@@ -98,7 +98,7 @@ jobs:
               fi
             else
               echo "Warning: $TEST_FILE not found, skipping"
-              ((SKIPPED++))
+              SKIPPED=$((SKIPPED + 1))
             fi
           done
 
