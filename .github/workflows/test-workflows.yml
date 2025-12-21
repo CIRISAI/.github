@@ -11,6 +11,8 @@ on:
         options:
           - dry-run
           - qa-only
+          - install-sh
+          - wheel
           - full-matrix
 
 jobs:
@@ -31,17 +33,35 @@ jobs:
       dry_run: false
       base_url: 'http://localhost:8080'
 
-  # Full matrix - tests install.sh end-to-end
-  full-matrix:
-    if: inputs.test_type == 'full-matrix'
+  # install.sh only
+  install-sh:
+    if: inputs.test_type == 'install-sh'
     uses: ./.github/workflows/_install-matrix.yml
     with:
       install_method: 'install.sh'
       first_run_test: true
       run_qa: false
 
+  # wheel only
+  wheel:
+    if: inputs.test_type == 'wheel'
+    uses: ./.github/workflows/_install-matrix.yml
+    with:
+      install_method: 'wheel'
+      first_run_test: true
+      run_qa: false
+
+  # Full matrix - tests all methods
+  full-matrix:
+    if: inputs.test_type == 'full-matrix'
+    uses: ./.github/workflows/_install-matrix.yml
+    with:
+      install_method: 'all'
+      first_run_test: true
+      run_qa: false
+
   summary:
-    needs: [dry-run, qa-only, full-matrix]
+    needs: [dry-run, qa-only, install-sh, wheel, full-matrix]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -53,4 +73,6 @@ jobs:
           echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
           echo "| dry-run | ${{ needs.dry-run.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| qa-only | ${{ needs.qa-only.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| install-sh | ${{ needs.install-sh.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| wheel | ${{ needs.wheel.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| full-matrix | ${{ needs.full-matrix.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
