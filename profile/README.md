@@ -2,7 +2,7 @@
 
 **Open-source ethical AI alignment framework**
 
-Privacy-first. Designed to be deleted. 100% AGPL-3.0.
+Privacy-first. 100% AGPL-3.0.
 
 [Website](https://ciris.ai) | [Discord](https://discord.gg/fKrVfXC9) | [Status](https://ciris.ai/status) | [Architecture](https://ciris.ai/architecture)
 
