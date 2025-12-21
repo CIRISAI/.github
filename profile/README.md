@@ -74,12 +74,4 @@ See [architecture](https://ciris.ai/architecture) for details.
 
 ---
 
-## Support CIRIS
-
-CIRIS L3C (Low-Profit LLC). Donations are not tax-deductible.
-
-[Donate via Stripe](https://buy.stripe.com/eVa29gddk7mpaGI4gg)
-
----
-
 © 2025 Eric Moore and CIRIS L3C | [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.en.html)
