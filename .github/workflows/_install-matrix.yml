@@ -49,11 +49,26 @@ jobs:
           # Debug: show what we have
           echo "=== Directory contents ==="
           ls -la
-          echo "=== Venv check ==="
-          ls -la .venv/bin/ | head -10
+
+          echo "=== Looking for venv ==="
+          find . -name "activate" -type f 2>/dev/null | head -5 || echo "No activate found"
+          ls -la .venv/ 2>/dev/null || echo "No .venv directory"
+
+          # Try to find and use whatever venv exists
+          if [ -d ".venv" ]; then
+            VENV_PATH=".venv"
+          elif [ -d "venv" ]; then
+            VENV_PATH="venv"
+          else
+            echo "ERROR: No virtual environment found!"
+            exit 1
+          fi
+
+          echo "=== Using venv at: $VENV_PATH ==="
+          ls -la "$VENV_PATH/bin/" | head -10
 
           # Activate venv
-          source .venv/bin/activate
+          source "$VENV_PATH/bin/activate"
           echo "Python: $(which python)"
           echo "Python version: $(python --version)"
 
@@ -126,10 +141,21 @@ jobs:
           # Debug
           echo "=== Directory contents ==="
           ls -la
-          echo "=== Venv check ==="
-          ls -la .venv/bin/ | head -10
 
-          source .venv/bin/activate
+          echo "=== Looking for venv ==="
+          find . -name "activate" -type f 2>/dev/null | head -5 || echo "No activate found"
+
+          if [ -d ".venv" ]; then
+            VENV_PATH=".venv"
+          elif [ -d "venv" ]; then
+            VENV_PATH="venv"
+          else
+            echo "ERROR: No virtual environment found!"
+            exit 1
+          fi
+
+          echo "=== Using venv at: $VENV_PATH ==="
+          source "$VENV_PATH/bin/activate"
           echo "Python: $(which python)"
 
           echo "Starting agent..."
