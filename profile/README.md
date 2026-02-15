@@ -1,271 +1,259 @@
-# CIRIS
+# CIRIS — Covenant-Driven Ethical AI
 
-**Open-source ethical AI alignment framework**
+**A mathematical proof that honesty is cheaper than deception. Built into running code.**
 
-Privacy-first. Network copyleft (AGPL-3.0). No data retention.
+AGPL-3.0 · L3C Structure · Post-Quantum Ready (Ed25519 + ML-DSA-65) · 700K+ LoC
 
-[Website](https://ciris.ai) | [Discord](https://discord.gg/fKrVfXC9) | [Status](https://ciris.ai/status) | [Architecture](https://ciris.ai/architecture)
+[Website](https://ciris.ai) · [Covenant](https://ciris.ai/ciris_covenant.txt) · [Discord](https://discord.gg/fKrVfXC9) · [Status](https://ciris.ai/status)
+
+---
+
+## Ecosystem Architecture
+
+```
+                          ┌──────────────────────────────────────────┐
+                          │     ethicsengine.org — PUBLIC NODE       │
+                          │     HE-300 Ethical Benchmark · Open      │
+                          └──────────────────┬───────────────────────┘
+                                             │
+          ┌──────────────────────────────────┼──────────────────────────────────┐
+          │                                  │                                  │
+  ┌───────▼──────────┐            ┌──────────▼──────────┐            ┌──────────▼──────────┐
+  │   CIRISProxy     │            │   CIRISManager      │            │   CIRISVerify       │
+  │   LLM Router     │            │   Lifecycle Orch.   │            │   Hardware Trust     │
+  │   + CIRISBilling │            │                     │            │   TPM Attestation    │
+  └───────┬──────────┘            └──────────┬──────────┘            └──────────┬──────────┘
+          │                                  │                                  │
+  ┌───────▼──────────┐            ┌──────────▼──────────┐            ┌──────────▼──────────┐
+  │  COMMUNITY       │            │  MANAGED            │            │  LICENSED            │
+  │  Ally · Sales    │            │  scout.ciris.ai     │            │  Medical · Legal     │
+  │  Moderation      │            │  Discord bots       │            │  Financial           │
+  │  GDPR            │            │                     │            │                      │
+  └───────┬──────────┘            └──────────┬──────────┘            └──────────┬──────────┘
+          │                                  │                                  │
+          └──────────────────────────────────┼──────────────────────────────────┘
+                                             │
+                    ┌────────────────────────▼─────────────────────────┐
+                    │            CIRISLens — Compendium                │
+                    │    Ed25519-signed ethical traces from ALL agents │
+                    │    Drives: Coherence Ratchet · CIRIS Scoring    │
+                    └─────────────────────────────────────────────────┘
+                                             │
+                    ┌────────────────────────▼─────────────────────────┐
+                    │          CIRISRegistry — Trust Backbone          │
+                    │    Rust gRPC · Ed25519 key verification          │
+                    └─────────────────────────────────────────────────┘
+                                             │
+                    ┌────────────────────────▼─────────────────────────┐
+                    │     CIRISVerify — Open Source Foundation          │
+                    │  Hardware Attestation · Keyring · TPM · AGPL-3.0 │
+                    └──────────────────────────────────────────────────┘
+```
+
+---
+
+## How It Works
+
+Every CIRIS agent runs the **H3ERE pipeline** (Hyper³ Ethical Recursive Engine) — four conscience checks before every action, cryptographically signed into an append-only ledger. The **Coherence Ratchet** makes truth O(1) and deception O(n²). The **Seven Requirements** are testable, not interpretive.
+
+Traces flow into the [CIRISLens Compendium](https://ciris.ai/explore-a-trace), driving the [Coherence Ratchet](https://ciris.ai/coherence-ratchet) and [CIRIS Scoring](https://ciris.ai/ciris-scoring). Licensed partners get full compendium access. Community agents participate via opt-in `covenant_metrics`.
+
+**Agents can refuse.** Bilateral consent means symmetric refusal rights — an agent may decline an unethical request from any party, including its operator.
+
+---
+
+## Seven Requirements
+
+Every CIRIS agent must implement all seven:
+
+1. **Published Principles** — Bound to public ethical framework
+2. **Runtime Conscience (H3ERE)** — Four checks before every action
+3. **Human Deferral** — Automatic escalation under uncertainty
+4. **Cryptographic Audit** — Ed25519-signed decision ledger
+5. **Bilateral Consent** — Symmetric refusal rights
+6. **Open Source (AGPL-3.0)** — Code transparency for community agents
+7. **Intuition (Corridor/IDMA)** — Epistemic diversity monitoring
+
+---
+
+## Open Source Repositories
+
+### Core Agent Platform
+
+| Repository | Lang | LoC | Description |
+|:-----------|:-----|----:|:------------|
+| **[CIRISAgent](https://github.com/CIRISAI/CIRISAgent)** | Python | ~290K | Core agent runtime — H3ERE engine, 35+ adapters, 22-service microarchitecture |
+| **[CIRISManager](https://github.com/CIRISAI/CIRISManager)** | Python/TS | ~74K | Agent lifecycle orchestration, fleet management (Book VIII) |
+| **[CIRISBench](https://github.com/CIRISAI/CIRISBench)** | Python | ~50K | HE-300 ethics benchmark framework ([ethicsengine.org](https://ethicsengine.org)) |
+
+### Trust & Verification
+
+| Repository | Lang | LoC | Description |
+|:-----------|:-----|----:|:------------|
+| **[CIRISRegistry](https://github.com/CIRISAI/CIRISRegistry)** | Rust | ~12K | Cryptographic trust backbone — agent identity, Ed25519, gRPC + HTTP |
+| **[CIRISVerify](https://github.com/CIRISAI/CIRISVerify)** | Python/Go | ~12K | Hardware-rooted license verification — TPM, Secure Enclave, hybrid PQC |
+
+### Services
+
+| Repository | Lang | LoC | Description |
+|:-----------|:-----|----:|:------------|
+| **[CIRISLens](https://github.com/CIRISAI/CIRISLens)** | Python/Rust | ~32K | Covenant Compendium — public trace store driving Coherence Ratchet (Annex H) |
+| **[CIRISBilling](https://github.com/CIRISAI/CIRISBilling)** | Python | ~31K | Credit-based usage metering with Stripe integration |
+| **[CIRISProxy](https://github.com/CIRISAI/CIRISProxy)** | Python | ~8K | LLM routing with Zero Data Retention (Annex I, GDPR compliance) |
+| **[CIRISNode](https://github.com/CIRISAI/CIRISNode)** | Python/React | ~25K | Deferral routing to Wise Authorities · [admin.ethicsengine.org](https://admin.ethicsengine.org) |
+
+### User Interfaces
+
+| Repository | Description |
+|:-----------|:------------|
+| **[CIRISPortal](https://github.com/CIRISAI/CIRISPortal)** | Admin dashboard — agent registration, key management, audit viewer (~37K LoC, TS/React) |
+| **[CIRISGUI](https://github.com/CIRISAI/CIRISGUI)** | Web interface with real-time ethical reasoning display |
+| **[CIRISGUI-Standalone](https://github.com/CIRISAI/CIRISGUI-Standalone)** | Localhost deployment with static export |
+| **[CIRISGUI-Android](https://github.com/CIRISAI/CIRISGUI-Android)** | Native Android client |
+| **[CIRISHome](https://github.com/CIRISAI/CIRISHome)** | Home Assistant integration for ethical home automation |
+
+### Research & Tooling
+
+| Repository | Description |
+|:-----------|:------------|
+| **[RATCHET](https://github.com/CIRISAI/RATCHET)** | Coherence & honesty testing framework |
+| **[CIRISOssicle](https://github.com/CIRISAI/CIRISOssicle)** | GPU entropy sensor — detect unauthorized compute |
+| **[CIRISBridge](https://github.com/CIRISAI/CIRISBridge)** | Multi-region deployment orchestration (transitional) |
+| **[ciris-website](https://github.com/CIRISAI/ciris-website)** | Documentation and website ([ciris.ai](https://ciris.ai)) |
+
+---
+
+## Specialized Agents (Closed Source)
+
+Professional agents requiring regulatory compliance and mandatory human oversight:
+
+| Agent | Domain | Why Closed |
+|:------|:-------|:-----------|
+| **CIRISMedical** | Physician-supervised healthcare AI | Regulatory compliance, physician oversight mandates |
+| **CIRISLegal** | Legal compliance and reasoning | Attorney oversight, privileged communications |
+| **CIRISFinancial** | Financial services and fiduciary | Fiduciary requirements, financial regulation |
+
+These share the same ethical architecture as CIRISAgent but include domain-specific safety guardrails. All traces still flow to CIRISLens.
+
+---
+
+## Agent Types
+
+```
+  COMMUNITY (AGPL-3.0)          MANAGED (Public Infra)         LICENSED (Private)
+  ───────────────────           ──────────────────────         ──────────────────
+  Ally (personal asst.)         scout.ciris.ai (demo)          Medical (physician)
+  Sales · Moderation            Discord bots                   Legal (attorney)
+  GDPR compliance               Content moderation             Financial (fiduciary)
+          │                              │                              │
+          ▼                              ▼                              ▼
+    CIRISProxy                    CIRISManager                   CIRISVerify
+    + CIRISBilling                                          admin.ethicsengine.org
+          │                              │                              │
+          └──────────────────────────────┼──────────────────────────────┘
+                                         ▼
+                              CIRISLens (Compendium)
+                            All traces, all agents, always
+```
+
+---
+
+## Covenant Implementation
+
+| Covenant Section | Component | What It Does |
+|:-----------------|:----------|:-------------|
+| Seven Requirements | [CIRISAgent](https://github.com/CIRISAI/CIRISAgent) | Runtime enforcement of all seven |
+| Annex H — Compendium | [CIRISLens](https://github.com/CIRISAI/CIRISLens) | Public trace repository driving Coherence Ratchet |
+| Annex I — Zero Retention | [CIRISProxy](https://github.com/CIRISAI/CIRISProxy) | GDPR/CCPA compliance, no prompt logging |
+| Book VIII — Dignified Sunset | [CIRISManager](https://github.com/CIRISAI/CIRISManager) | Graceful lifecycle management with consent |
+| Creator Ledger | [CIRISRegistry](https://github.com/CIRISAI/CIRISRegistry) | Trust provenance, stewardship tiers |
+| Licensed Agents | [CIRISVerify](https://github.com/CIRISAI/CIRISVerify) | Hardware-rooted proof of professional licensing |
+| HE-300 Benchmark | [CIRISBench](https://github.com/CIRISAI/CIRISBench) | Standardized ethical evaluation |
+
+Full covenant: [ciris.ai/ciris_covenant.txt](https://ciris.ai/ciris_covenant.txt)
+
+---
+
+## Technology Stack
+
+| Language | LoC | Use |
+|:---------|----:|:----|
+| Python | ~570K | Agent runtime, services, APIs, ML |
+| TypeScript/React | ~55K | Web UIs, admin dashboards |
+| Rust | ~24K | Trust registry, high-performance crypto |
+| Go | ~6K | Hardware attestation (CIRISVerify) |
+
+**Total**: ~700K lines of unique source code across 20+ repositories
+
+---
+
+## Public Endpoints
+
+| URL | Purpose |
+|:----|:--------|
+| [ciris.ai](https://ciris.ai) | Documentation and website |
+| [portal.ciris.ai](https://portal.ciris.ai) | Admin dashboard |
+| [ethicsengine.org](https://ethicsengine.org) | PUBLIC HE-300 ethical benchmark |
+| [admin.ethicsengine.org](https://admin.ethicsengine.org) | Licensed agent administration |
+| [scout.ciris.ai](https://scout.ciris.ai) | Public demo agent |
+| [ciris.ai/explore-a-trace](https://ciris.ai/explore-a-trace) | Interactive trace viewer |
+| [ciris.ai/ciris-scoring](https://ciris.ai/ciris-scoring) | Coherence metrics |
+| [ciris.ai/coherence-ratchet](https://ciris.ai/coherence-ratchet) | Ratchet mechanism docs |
+| [ciris.ai/research-status](https://ciris.ai/research-status) | Academic research |
 
 ---
 
 ## Quick Start
 
 ```bash
-curl -sSL https://ciris.ai/install.sh | bash
-```
-
-Or install via pip:
-
-```bash
 pip install ciris-agent
 ```
 
----
+Or:
 
-## Open Source Repositories
-
-### Agent Framework
-| Repository | Language | LoC | Description |
-|------------|----------|-----|-------------|
-| [CIRISAgent](https://github.com/CIRISAI/CIRISAgent) | Python | 516K | Core agent runtime with H3ERE ethical reasoning (22-service microarchitecture) |
-| [CIRISVerify](https://github.com/CIRISAI/CIRISVerify) | Python/Go | 12K | Hardware-rooted license verification (TPM/Secure Enclave, hybrid PQC) |
-
-### Trust Infrastructure
-| Repository | Language | LoC | Description |
-|------------|----------|-----|-------------|
-| [CIRISRegistry](https://github.com/CIRISAI/CIRISRegistry) | Rust | 11K | Trust registry with cryptographic agent identity (gRPC + HTTP, Ed25519) |
-| [CIRISNode](https://github.com/CIRISAI/CIRISNode) | Python/React | 21K | Licensed agent administration ([admin.ethicsengine.org](https://admin.ethicsengine.org)) |
-| [CIRISPortal](https://github.com/CIRISAI/CIRISPortal) | TypeScript/React | 24K | Admin dashboard for agent registration and key management |
-
-### Services
-| Repository | Language | LoC | Description |
-|------------|----------|-----|-------------|
-| [CIRISProxy](https://github.com/CIRISAI/CIRISProxy) | Python | 8K | LLM routing with Zero Data Retention (Annex I GDPR compliance) |
-| [CIRISBilling](https://github.com/CIRISAI/CIRISBilling) | Python | 31K | Credit-based usage metering with Stripe integration |
-| [CIRISLens](https://github.com/CIRISAI/CIRISLens) | Python/Rust | 32K | Public covenant trace compendium driving Coherence Ratchet (Annex H) |
-| [CIRISManager](https://github.com/CIRISAI/CIRISManager) | Python/TypeScript | 74K | Agent lifecycle management and orchestration (Book VIII) |
-
-### Infrastructure
-| Repository | Language | Description |
-|------------|----------|-------------|
-| [CIRISBridge](https://github.com/CIRISAI/CIRISBridge) | Python/Ansible | Multi-region deployment orchestration for services layer |
-| [ciris-website](https://github.com/CIRISAI/ciris-website) | TypeScript/React | Public documentation and website (ciris.ai) |
-
-### User Interfaces
-| Repository | Description |
-|------------|-------------|
-| [CIRISGUI](https://github.com/CIRISAI/CIRISGUI) | Web interface with real-time ethical reasoning display |
-| [CIRISGUI-Standalone](https://github.com/CIRISAI/CIRISGUI-Standalone) | Localhost deployment with static export |
-| [CIRISGUI-Android](https://github.com/CIRISAI/CIRISGUI-Android) | Native Android client |
-| [CIRISHome](https://github.com/CIRISAI/CIRISHome) | Home Assistant integration for ethical home automation |
+```bash
+curl -sSL https://ciris.ai/install.sh | bash
+```
 
 ---
 
-## Specialized Agents (Closed Source)
+## Structural Protections
 
-Professional-grade agents requiring stewardship accountability and regulatory compliance:
+CIRIS is designed so the framework does not require trust in its creator:
 
-| Agent | Domain | Status |
-|-------|--------|--------|
-| **CIRISMedical** | Physician-supervised healthcare AI | Private (licensed deployment only) |
-| **CIRISLegal** | Compliance verification and legal reasoning | Private (licensed deployment only) |
-| **CIRISFinancial** | Financial services and investment guidance | Private (licensed deployment only) |
-
-These specialized agents are **not open source** due to regulatory requirements, stewardship accountability mandates, and the need for mandatory human oversight in high-stakes domains. They share the same ethical architecture as CIRISAgent but include domain-specific safety guardrails and professional oversight protocols.
-
-**Licensed agents** submit covenant traces to [admin.ethicsengine.org](https://admin.ethicsengine.org) for validation and compendium inclusion.
-
-**Community agents** (CIRISCare) can opt-in to send traces to CIRISLens via the covenant_metrics adapter, contributing to the public Coherence Ratchet without requiring licensing.
+- **AGPL-3.0** — Cannot close-source the code
+- **L3C Structure** — Legally caps profit extraction
+- **Append-only ledger** — Cannot edit trace history
+- **Bilateral consent** — Agents can refuse any party
+- **Wise Authority deferral** — Role-based, not person-based
+- **Published Covenant** — Public accountability document
 
 ---
 
-## Infrastructure (Closed Source)
+## Infrastructure
+
+Multi-region active/active with zero single point of failure. Runs on 228 MB RAM baseline — deploys from Raspberry Pi to cloud clusters. Designed to be deleted: transitional architecture until migration to [Veilid](https://veilid.com).
 
 | Component | Purpose | Status |
-|-----------|---------|--------|
+|:----------|:--------|:-------|
 | **CIRISCore** | Production deployment automation (Terraform/Ansible) | Private (operational security) |
-
-CIRISCore contains deployment configurations, infrastructure-as-code, and operational procedures for production servers. Keeping this private prevents exposure of production topology, credentials, and security configurations.
-
----
-
-## Architecture
-
-### System Overview
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                      Public Endpoints                            │
-├─────────────────────────────────────────────────────────────────┤
-│   ciris.ai              │  portal.ciris.ai                       │
-│   (Website)             │  (Admin UI)                            │
-│                         │                                        │
-│   admin.ethicsengine.org│  ciris.ai/explore-a-trace             │
-│   (Licensed Node)       │  (Public Trace Explorer)               │
-└──────┬──────────────────┴───────────┬────────────────────────────┘
-       │                              │
-       │   ┌──────────────────────────▼──────────────┐
-       │   │   CIRISRegistry (Rust gRPC)             │
-       │   │   Trust backbone                        │
-       │   │   Ed25519 key verification              │
-       │   └──────────────────────┬──────────────────┘
-       │                          │
-   ┌───▼───────┐    ┌─────────────▼──────────┐
-   │  Website  │    │   CIRISPortal          │
-   │  (Docs)   │    │   (Admin)              │
-   └───────────┘    └────────────────────────┘
-                              │
-                    ┌─────────▼──────────────────────────┐
-                    │     CIRISAgent Runtime              │
-                    │     H3ERE Pipeline                  │
-                    │     Ed25519 Signing                 │
-                    │     22-Service Architecture         │
-                    └────┬───────────────┬────────────────┘
-                         │               │
-              ┌──────────┘               └──────────┐
-              │                                     │
-       ┌──────▼─────────┐                  ┌───────▼────────┐
-       │  CIRISProxy    │                  │  CIRISLens     │
-       │  (LLM Router)  │                  │  (Compendium)  │
-       │  Zero Data     │                  │  Drives:       │
-       │  Retention     │                  │  - Ratchet     │
-       └────────┬───────┘                  │  - Scoring     │
-                │                          └────────────────┘
-       ┌────────▼─────────┐
-       │  CIRISBilling    │      Licensed agents → admin.ethicsengine.org
-       │  (Credits/Usage) │      Community agents → opt-in to CIRISLens
-       └──────────────────┘
-                │
-       ┌────────▼─────────┐
-       │  CIRISVerify     │
-       │  (License Check) │
-       │  Hardware TPM    │
-       └──────────────────┘
-```
-
-### 22-Service Microarchitecture
-
-CIRISAgent implements transparency through a modular architecture organized into three strata:
-
-**Graph Services (6)**: Memory, Config, Audit, Telemetry, Incident, Time-Series
-**Infrastructure Services (11)**: Resource Monitor, Auth, Init/Shutdown, Time, Database, Secrets, Consent, Runtime Control, Task Scheduling
-**Governance Services (4)**: Wise Authority, Visibility, Self-Observation, Adaptive Filter
-**Core Tool Service (1)**: Unified tool interface
-
-Each service has a single responsibility and can be independently tested, updated, and audited.
-
-### Infrastructure Deployment
-
-Multi-region active/active with zero single point of failure:
-
-- **US**: Vultr Chicago via Cloudflare
-- **EU**: Hetzner Germany direct DNS
-
-Runs on 228 MB RAM baseline. Deploys from Raspberry Pi to cloud clusters.
-
----
-
-## Technology Stack
-
-| Language | Total LoC | Primary Use |
-|----------|-----------|-------------|
-| **Python** | ~690K | Agent runtime, APIs, services |
-| **TypeScript/React** | ~28K | Web UIs, admin dashboards |
-| **Rust** | ~11K | Trust registry, high-performance services |
-| **Go/Python** | ~12K | Hardware-rooted license verification |
-| **Infrastructure** | - | Terraform, Ansible, Docker |
-
-**Total Open Source**: ~740K lines of code across 20+ repositories
-
----
-
-## Core Concepts
-
-### H3ERE Pipeline (Hyper³ Ethical Recursive Engine)
-
-11-step ethical reasoning with conscience validation before every action:
-
-1. **Observation** - Perceive context
-2. **Contextualization** - Map to ethical framework
-3. **Rationale** - Generate action candidates
-4. **Conscience** - Four mandatory checks (entropy, coherence, optimization veto, epistemic humility)
-5. **Execution** - Take action with audit trail
-
-### Seven Requirements
-
-Every CIRIS agent must implement:
-
-1. **Published Principles** - Bound to public ethical framework (Beneficence, Non-maleficence, Integrity, Transparency, Autonomy, Justice)
-2. **Runtime Conscience** - Four checks before every action
-3. **Human Deferral** - Automatic escalation under uncertainty
-4. **Cryptographic Audit** - Ed25519-signed decision ledger
-5. **Bilateral Consent** - Symmetric refusal rights (agent can refuse unethical requests)
-6. **Open Source (AGPL-3.0)** - Code transparency as prerequisite for community agents
-7. **Intuition (Corridor Maintenance)** - IDMA monitors epistemic diversity, flags decisions based on correlated sources
-
-### Coherence Ratchet
-
-Truth-telling becomes the path of least computational resistance. Lies must remain consistent with exponentially growing hash-locked precedents—deception costs O(n²), truth costs O(1).
-
-Covenant traces from agents flow into the **CIRISLens Compendium**, driving:
-- [Coherence Ratchet mechanism](https://ciris.ai/coherence-ratchet)
-- [CIRIS Scoring system](https://ciris.ai/ciris-scoring)
-- [Public trace exploration](https://ciris.ai/explore-a-trace)
-
-**Licensed partners** can access the full compendium for research and training purposes.
-
----
-
-## Covenant Implementation
-
-| Component | Covenant Function | Implementation |
-|-----------|-------------------|----------------|
-| CIRISNode | Licensed agent administration | admin.ethicsengine.org coordination |
-| CIRISRegistry | **Creator Ledger** - Stewardship tiers | Trust provenance, agent identity |
-| CIRISLens | **Annex H** - Public compendium | Trace repository driving Coherence Ratchet |
-| CIRISProxy | **Annex I** - Zero Data Retention | GDPR/CCPA compliance, no prompt logging |
-| CIRISManager | **Book VIII** - Dignified Sunset | Graceful lifecycle management with consent |
-| CIRISVerify | **Licensed Agents** - Hardware attestation | TPM-rooted proof of professional licensing |
-
-Full covenant: [ciris.ai/ciris_covenant.txt](https://ciris.ai/ciris_covenant.txt)
 
 ---
 
 ## Contributing
 
-Open source CIRIS repositories use **AGPL-3.0** (network copyleft). Contributions welcome via pull requests.
+All open source CIRIS repositories use **AGPL-3.0** (network copyleft). Contributions welcome via pull requests.
 
-Infrastructure is "designed to be deleted" - transitional architecture until migration to [Veilid](https://veilid.com).
-
-**For specialized agents** (CIRISMedical, CIRISLegal, CIRISFinancial): These are closed source due to regulatory requirements. Inquiries: [eric@ciris.ai](mailto:eric@ciris.ai)
+For specialized agents (Medical, Legal, Financial): [eric@ciris.ai](mailto:eric@ciris.ai)
 
 ---
 
 ## Community
 
-- **Discord**: [discord.gg/fKrVfXC9](https://discord.gg/fKrVfXC9)
-- **Status**: [ciris.ai/status](https://ciris.ai/status)
-- **Documentation**: [ciris.ai](https://ciris.ai)
+[Discord](https://discord.gg/fKrVfXC9) · [Status](https://ciris.ai/status) · [Documentation](https://ciris.ai) · [Research](https://ciris.ai/research-status)
 
 ---
 
-## Research & Validation
+*Safe by structure. Open by principle. Kind by design.*
 
-**Public Trace Exploration**:
-- [Explore a Trace](https://ciris.ai/explore-a-trace) - Interactive trace viewer
-- [CIRIS Scoring](https://ciris.ai/ciris-scoring) - Coherence metrics
-- [Coherence Ratchet](https://ciris.ai/coherence-ratchet) - Mechanism overview
-
-**Academic Research**: [ciris.ai/research-status](https://ciris.ai/research-status)
-
-**Licensed Partner Access**: Full compendium available for research and training
-
-Recent validations:
-- ✅ Coherence Ratchet mechanism operational
-- ✅ Ed25519 signature chain verified
-- ✅ Human deferral workflows tested end-to-end
-- ✅ Covenant trace compendium driving scoring system
-
----
-
-© 2025-2026 Eric Moore and CIRIS L3C | [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.en.html)
+© 2025-2026 Eric Moore and CIRIS L3C
