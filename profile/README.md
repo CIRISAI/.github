@@ -1,4 +1,4 @@
-# CIRIS — Covenant-Driven Ethical AI
+# CIRIS — Accord-Driven Ethical AI
 
 **A mathematical proof that honesty is cheaper than deception. Built into running code.**
 
