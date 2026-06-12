@@ -99,12 +99,16 @@ cmd_snapshot() {
     # fingerprint that changes if ANY ref is added/removed/moved.
     digest="$(echo "$refs" | jq -r 'to_entries|sort_by(.key)|map("\(.key) \(.value)")|.[]' | sha256sum | cut -d' ' -f1)"
     echo "  ok    $name: $n refs  ${digest:0:12}" >&2
-    jq --arg name "$name" --arg digest "$digest" --argjson refcount "$n" --argjson refs "$refs" \
-       '.[$name] = {ref_count:$refcount, digest:$digest, refs:$refs}' "$tmp" > "$tmp.2" && mv "$tmp.2" "$tmp"
+    # refs can be large (CIRISAgent has >1000 refs) — pass via file, not argv,
+    # to avoid "Argument list too long".
+    printf '%s' "$refs" > "$tmp.refs"
+    jq --arg name "$name" --arg digest "$digest" --argjson refcount "$n" --slurpfile refs "$tmp.refs" \
+       '.[$name] = {ref_count:$refcount, digest:$digest, refs:$refs[0]}' "$tmp" > "$tmp.2" && mv "$tmp.2" "$tmp"
   done
+  rm -f "$tmp.refs"
 
-  jq -n --arg label "$label" --arg base "$base" --argjson repos "$(cat "$tmp")" \
-     '{label:$label, base:$base, repo_count:($repos|length), total_refs:([$repos[].ref_count]|add // 0), repos:$repos}' > "$out"
+  jq -n --arg label "$label" --arg base "$base" --slurpfile repos "$tmp" \
+     '$repos[0] as $r | {label:$label, base:$base, repo_count:($r|length), total_refs:([$r[].ref_count]|add // 0), repos:$r}' > "$out"
   rm -f "$tmp"
   echo "wrote $out ($(jq '.repo_count' "$out") repos, $(jq '.total_refs' "$out") refs)" >&2
 }
