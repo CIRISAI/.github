@@ -247,9 +247,18 @@ For specialized agents (Medical, Legal, Financial): [eric@ciris.ai](mailto:eric@
 
 ## Events
 
-Where you can find CIRIS in person — see [events/](https://github.com/CIRISAI/.github/tree/main/events) for the full list.
+Where you can find CIRIS in person, plus recorded talks — see [events/](https://github.com/CIRISAI/.github/tree/main/events) for the full list.
 
-- **Jul 18–19, 2026** — [Secure & Sovereign AI Workshop](https://foresight.org/events/2026-secure-sovereign-ai-workshop/) (Foresight Institute), Berlin
+**Upcoming**
+
+- **Jul 18–19, 2026** — [Secure & Sovereign AI Workshop](https://foresight.org/events/2026-secure-sovereign-ai-workshop/) (Foresight Institute), Berlin — Eric presenting
+
+**Recent talks & recordings**
+
+- **Apr 28, 2026** — [CIRIS: An Open-Source Ethical AI Governance Framework](https://luma.com/fg2png4u), Agentic Engineering Chicago — [recording](https://youtu.be/Jgdw9WvjTMc)
+- **Feb 9, 2026** — [Building AI with a Conscience](https://enotice.vtools.ieee.org/public/191195), IEEE Madison Section
+- **2025** — [The Need for Urgency: Embedding Ethical Reasoning in AI Systems](https://www.youtube.com/watch?v=ZvVIPE8iw30), CodeNinja Podcast
+- **Apr 17, 2025** — [Exploring the CIRIS Covenant](https://www.youtube.com/watch?v=JoJUd9oJ8CU)
 
 ---
 
