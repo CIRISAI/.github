@@ -1,8 +1,8 @@
 # CIRIS — Accord-Driven Ethical AI
 
-**A mathematical proof that honesty is cheaper than deception. Built into running code.**
+**An ethical AI framework designed so honesty is structurally cheaper to maintain than deception — built into running code.**
 
-AGPL-3.0 · L3C Structure · Post-Quantum Ready (Ed25519 + ML-DSA-65) · <!--CENSUS:LOC-->1.5M+<!--/CENSUS:LOC--> LoC
+AGPL-3.0 · L3C Structure · Post-Quantum Hybrid Signatures (Ed25519 + ML-DSA-65) · <!--CENSUS:LOC-->1.5M+<!--/CENSUS:LOC--> LoC
 
 [Website](https://ciris.ai) · [Covenant](https://ciris.ai/ciris_covenant.txt) · [Discord](https://discord.gg/fKrVfXC9) · [Status](https://ciris.ai/status)
 
@@ -54,7 +54,7 @@ AGPL-3.0 · L3C Structure · Post-Quantum Ready (Ed25519 + ML-DSA-65) · <!--CEN
 
 ## How It Works
 
-Every CIRIS agent runs the **H3ERE pipeline** (Hyper³ Ethical Recursive Engine) — four conscience checks before every action, cryptographically signed into an append-only ledger. The **Coherence Ratchet** makes truth O(1) and deception O(n²). The **Seven Requirements** are testable, not interpretive.
+Every CIRIS agent runs the **H3ERE pipeline** (Hyper³ Ethical Recursive Engine) — four conscience checks before every action, cryptographically signed into an append-only ledger. The **Coherence Ratchet** makes consistent honesty cheaper to maintain than deception: every claim is hash-locked into the record, so a lie must stay consistent with an ever-growing chain of signed precedents. The **Seven Requirements** are testable, not interpretive.
 
 Traces flow into the [CIRISLens Compendium](https://ciris.ai/explore-a-trace), driving the [Coherence Ratchet](https://ciris.ai/coherence-ratchet) and [CIRIS Scoring](https://ciris.ai/ciris-scoring). Licensed partners get full compendium access. Community agents participate via opt-in `covenant_metrics`.
 
