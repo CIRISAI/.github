@@ -38,7 +38,9 @@ The end-state architecture is a 5-package stack: three Rust **substrate** crates
 CIRISEdge, CIRISPersist, and CIRISVerify — beneath **CIRISServer**, with **CIRISAgent**
 running on top, optionally. CIRISServer consolidates the federation-consensus, science,
 and trust-backbone layers (previously the separate NodeCore, LensCore, and Registry
-crates). Reticulum mesh transport is vendored, not one of the five.
+crates). Reticulum mesh transport is vendored from [Leviculum](https://codeberg.org/Lew_Palm/leviculum)
+— a full Rust Reticulum stack, upstream on Codeberg, where our patches have been merged — and
+is not one of the five.
 
 | Layer | Package | Lang |
 |:------|:--------|:-----|
