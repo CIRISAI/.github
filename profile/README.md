@@ -245,6 +245,20 @@ For specialized agents (Medical, Legal, Financial): [eric@ciris.ai](mailto:eric@
 
 ---
 
+## Events
+
+Where you can find CIRIS in person — see [events/](https://github.com/CIRISAI/.github/tree/main/events) for the full list.
+
+- **Jul 18–19, 2026** — [Secure & Sovereign AI Workshop](https://foresight.org/events/2026-secure-sovereign-ai-workshop/) (Foresight Institute), Berlin
+
+---
+
+## Acknowledgments
+
+CIRIS vendors its Reticulum mesh transport from [**Leviculum**](https://codeberg.org/Lew_Palm/leviculum), a full Rust implementation of the Reticulum network stack by [Lew Palm](https://codeberg.org/Lew_Palm). Thanks to Lew for maintaining it and for merging our upstream patches.
+
+---
+
 ## Community
 
 [Discord](https://discord.gg/fKrVfXC9) · [Status](https://ciris.ai/status) · [Documentation](https://ciris.ai) · [Research](https://ciris.ai/research-status)
