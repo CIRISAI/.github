@@ -8,50 +8,6 @@ AGPL-3.0 · L3C Structure · Post-Quantum Hybrid Signatures (Ed25519 + ML-DSA-65
 
 ---
 
-## Ecosystem Architecture
-
-```
-                          ┌──────────────────────────────────────────┐
-                          │     ethicsengine.org — PUBLIC NODE       │
-                          │     HE-300 Ethical Benchmark · Open      │
-                          └──────────────────┬───────────────────────┘
-                                             │
-          ┌──────────────────────────────────┼──────────────────────────────────┐
-          │                                  │                                  │
-  ┌───────▼──────────┐            ┌──────────▼──────────┐            ┌──────────▼──────────┐
-  │   CIRISProxy     │            │   CIRISManager      │            │   CIRISVerify       │
-  │   LLM Router     │            │   Lifecycle Orch.   │            │   Hardware Trust     │
-  │   + CIRISBilling │            │                     │            │   TPM Attestation    │
-  └───────┬──────────┘            └──────────┬──────────┘            └──────────┬──────────┘
-          │                                  │                                  │
-  ┌───────▼──────────┐            ┌──────────▼──────────┐            ┌──────────▼──────────┐
-  │  COMMUNITY       │            │  MANAGED            │            │  LICENSED            │
-  │  Ally · Sales    │            │  scout.ciris.ai     │            │  Medical · Legal     │
-  │  Moderation      │            │  Discord bots       │            │  Financial           │
-  │  GDPR            │            │                     │            │                      │
-  └───────┬──────────┘            └──────────┬──────────┘            └──────────┬──────────┘
-          │                                  │                                  │
-          └──────────────────────────────────┼──────────────────────────────────┘
-                                             │
-                    ┌────────────────────────▼─────────────────────────┐
-                    │            CIRISLens — Compendium                │
-                    │    Ed25519-signed ethical traces from ALL agents │
-                    │    Drives: Coherence Ratchet · CIRIS Scoring    │
-                    └─────────────────────────────────────────────────┘
-                                             │
-                    ┌────────────────────────▼─────────────────────────┐
-                    │          CIRISRegistry — Trust Backbone          │
-                    │    Rust gRPC · Ed25519 key verification          │
-                    └─────────────────────────────────────────────────┘
-                                             │
-                    ┌────────────────────────▼─────────────────────────┐
-                    │     CIRISVerify — Open Source Foundation          │
-                    │  Hardware Attestation · Keyring · TPM · AGPL-3.0 │
-                    └──────────────────────────────────────────────────┘
-```
-
----
-
 ## How It Works
 
 Every CIRIS agent runs the **H3ERE pipeline** (Hyper³ Ethical Recursive Engine) — four conscience checks before every action, cryptographically signed into an append-only ledger. The **Coherence Ratchet** makes consistent honesty cheaper to maintain than deception: every claim is hash-locked into the record, so a lie must stay consistent with an ever-growing chain of signed precedents. The **Seven Requirements** are testable, not interpretive.
@@ -76,19 +32,20 @@ Every CIRIS agent must implement all seven:
 
 ---
 
-## The Decentralized Agent — 7 Packages
+## The Decentralized Agent — 5 Packages
 
-Three Rust **substrate** crates, three Rust **fabric** crates on top, and the agent
-above that. Reticulum mesh transport is vendored, not one of the seven.
+The end-state architecture is a 5-package stack: three Rust **substrate** crates —
+CIRISEdge, CIRISPersist, and CIRISVerify — beneath **CIRISServer**, with **CIRISAgent**
+running on top, optionally. CIRISServer consolidates the federation-consensus, science,
+and trust-backbone layers (previously the separate NodeCore, LensCore, and Registry
+crates). Reticulum mesh transport is vendored, not one of the five.
 
 | Layer | Package | Lang |
 |:------|:--------|:-----|
 | **Substrate** | [CIRISVerify](https://github.com/CIRISAI/CIRISVerify) — hardware-rooted license verification | Rust |
 | **Substrate** | [CIRISPersist](https://github.com/CIRISAI/CIRISPersist) — signed events, time-series, runtime state | Rust |
 | **Substrate** | [CIRISEdge](https://github.com/CIRISAI/CIRISEdge) — Reticulum-native federation transport | Rust |
-| **Fabric** | [CIRISNodeCore](https://github.com/CIRISAI/CIRISNodeCore) — federation-consensus primitives | Rust |
-| **Fabric** | [CIRISLensCore](https://github.com/CIRISAI/CIRISLensCore) — science layer: cohort routes, manifold scoring | Rust |
-| **Fabric** | [CIRISRegistry](https://github.com/CIRISAI/CIRISRegistry) — cryptographic trust backbone, gRPC | Rust |
+| **Server** | [CIRISServer](https://github.com/CIRISAI/CIRISServer) — federation consensus, science layer (cohort routes, manifold scoring), and cryptographic trust backbone | Rust |
 | **Agent** | [CIRISAgent](https://github.com/CIRISAI/CIRISAgent) — H3ERE runtime + Compose Multiplatform client | Python / Kotlin |
 
 ---
